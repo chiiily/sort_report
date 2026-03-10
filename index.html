@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演算法教學導覽</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .nav-container {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .nav-link {
+            display: block;
+            padding: 15px 30px;
+            background: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        .nav-link:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        .description {
+            color: #7f8c8d;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-container">
+        <h1>演算法教學導覽</h1>
+        <div class="nav-links">
+            <a href="bubble_sort_demo.html" class="nav-link">氣泡排序法 (Bubble Sort)</a>
+        </div>
+        <p class="description">點擊上方連結開始學習各種排序演算法！</p>
+    </div>
+</body>
+</html>
