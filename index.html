@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>氣泡排序法教學</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+        .container { max-width: 800px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #ccc; padding: 32px; }
+        h1, h2 { color: #2c3e50; }
+        .array-bar {
+            display: inline-block;
+            width: 32px;
+            margin: 0 4px;
+            background: #3498db;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px 4px 0 0;
+            transition: background 0.3s;
+        }
+        .array-bar.active { background: #e67e22; }
+        .array-bar.sorted { background: #2ecc71; }
+        .controls { margin: 24px 0; }
+        button { padding: 8px 20px; font-size: 16px; border: none; border-radius: 4px; background: #2980b9; color: #fff; cursor: pointer; margin-right: 10px; }
+        button:disabled { background: #bdc3c7; cursor: not-allowed; }
+        .explanation { background: #f0f4f8; border-left: 4px solid #2980b9; padding: 16px; margin: 24px 0; border-radius: 4px; }
+        .complexity { background: #f9f6e7; border-left: 4px solid #e67e22; padding: 16px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>氣泡排序法（Bubble Sort）教學</h1>
+    <div class="explanation">
+        <h2>操作原理</h2>
+        <p>氣泡排序法是一種簡單的排序演算法。它會重複地走訪待排序的數列，依次比較相鄰的兩個元素，若順序錯誤則交換，直到整個數列有序為止。每一輪走訪後，最大的元素會像氣泡一樣浮到數列的尾端。</p>
+    </div>
+    <div class="controls">
+        <button id="startBtn">開始排序</button>
+        <button id="resetBtn">重設</button>
+    </div>
+    <div id="arrayContainer" style="margin-bottom: 24px;"></div>
+    <div id="stepInfo" class="explanation"></div>
+    <div class="complexity">
+        <h2>複雜度評估</h2>
+        <ul>
+            <li>最壞情況時間複雜度：O(n²)</li>
+            <li>平均情況時間複雜度：O(n²)</li>
+            <li>最佳情況時間複雜度：O(n)（當資料已經有序時）</li>
+            <li>空間複雜度：O(1)</li>
+        </ul>
+        <p>氣泡排序法雖然簡單易懂，但效率較低，適合用於小型資料集或教學用途。</p>
+    </div>
+</div>
+<script>
+const arrayContainer = document.getElementById('arrayContainer');
+const stepInfo = document.getElementById('stepInfo');
+const startBtn = document.getElementById('startBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let array = [];
+let steps = [];
+let currentStep = 0;
+let sorting = false;
+
+function randomArray(size = 8, min = 10, max = 99) {
+    const arr = [];
+    for (let i = 0; i < size; i++) {
+        arr.push(Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+    return arr;
+}
+
+function renderArray(arr, highlight = [], sortedIdx = []) {
+    arrayContainer.innerHTML = '';
+    arr.forEach((num, idx) => {
+        const bar = document.createElement('div');
+        bar.className = 'array-bar';
+        bar.style.height = (num * 2) + 'px';
+        bar.textContent = num;
+        if (highlight.includes(idx)) bar.classList.add('active');
+        if (sortedIdx.includes(idx)) bar.classList.add('sorted');
+        arrayContainer.appendChild(bar);
+    });
+}
+
+function recordStep(arr, i, j, swapped, sortedIdx) {
+    steps.push({ arr: arr.slice(), i, j, swapped, sortedIdx: sortedIdx.slice() });
+}
+
+function bubbleSortSteps(arr) {
+    steps = [];
+    let n = arr.length;
+    let sortedIdx = [];
+    let tempArr = arr.slice();
+    for (let i = 0; i < n - 1; i++) {
+        let swapped = false;
+        for (let j = 0; j < n - 1 - i; j++) {
+            recordStep(tempArr, j, j + 1, false, sortedIdx);
+            if (tempArr[j] > tempArr[j + 1]) {
+                [tempArr[j], tempArr[j + 1]] = [tempArr[j + 1], tempArr[j]];
+                swapped = true;
+                recordStep(tempArr, j, j + 1, true, sortedIdx);
+            }
+        }
+        sortedIdx.unshift(n - 1 - i);
+        recordStep(tempArr, -1, -1, false, sortedIdx);
+        if (!swapped) break;
+    }
+    // 最後一個元素也已排序
+    if (sortedIdx.length < n) {
+        for (let k = 0; k < n; k++) {
+            if (!sortedIdx.includes(k)) sortedIdx.push(k);
+        }
+        recordStep(tempArr, -1, -1, false, sortedIdx);
+    }
+}
+
+function showStep(step) {
+    renderArray(step.arr, step.i >= 0 ? [step.i, step.j] : [], step.sortedIdx);
+    if (step.i >= 0) {
+        stepInfo.innerHTML = `比較 <b>${step.arr[step.i]}</b> 和 <b>${step.arr[step.j]}</b>。` +
+            (step.swapped ? ' 需要交換，進行交換。' : ' 不需要交換。');
+    } else {
+        stepInfo.innerHTML = '本輪結束，最大值已移到尾端。';
+    }
+}
+
+function playSteps() {
+    if (currentStep >= steps.length) {
+        sorting = false;
+        startBtn.disabled = false;
+        stepInfo.innerHTML = '排序完成！';
+        renderArray(steps[steps.length - 1].arr, [], steps[steps.length - 1].sortedIdx);
+        return;
+    }
+    sorting = true;
+    startBtn.disabled = true;
+    showStep(steps[currentStep]);
+    currentStep++;
+    setTimeout(playSteps, 900);
+}
+
+function reset() {
+    array = randomArray();
+    bubbleSortSteps(array);
+    currentStep = 0;
+    renderArray(array);
+    stepInfo.innerHTML = '點擊「開始排序」觀看氣泡排序的操作過程。';
+    startBtn.disabled = false;
+}
+
+startBtn.onclick = function() {
+    if (!sorting) {
+        currentStep = 0;
+        playSteps();
+    }
+};
+
+resetBtn.onclick = function() {
+    if (!sorting) {
+        reset();
+    }
+};
+
+// 初始化
+reset();
+</script>
+</body>
+</html>
