@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>合併排序法教學</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: rgba(120, 170, 220, 0.18);
+            border-radius: 18px;
+            box-shadow: 0 6px 32px 0 rgba(44,62,80,0.10), 0 1.5px 6px 0 rgba(44,62,80,0.08);
+            padding: 40px 32px 32px 32px;
+        }
+        h1, h2 { color: #2c3e50; }
+        .array-bar {
+            display: inline-block;
+            width: 32px;
+            margin: 0 4px;
+            background: linear-gradient(180deg, #3498db 60%, #6dd5fa 100%);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px 6px 0 0;
+            transition: background 0.3s, box-shadow 0.3s;
+            vertical-align: bottom;
+            box-shadow: 0 2px 8px 0 rgba(52,152,219,0.10);
+        }
+        .array-bar.active {
+            background: linear-gradient(180deg, #e67e22 60%, #f9d423 100%);
+            box-shadow: 0 4px 16px 0 rgba(230,126,34,0.15);
+        }
+        .array-bar.sorted {
+            background: linear-gradient(180deg, #2ecc71 60%, #a8ff78 100%);
+            box-shadow: 0 4px 16px 0 rgba(46,204,113,0.12);
+        }
+        .controls {
+            margin: 24px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        button {
+            padding: 8px 22px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #2980b9 60%, #6dd5fa 100%);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 1.5px 6px 0 rgba(41,128,185,0.10);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .explanation {
+            background: rgba(240,244,248,0.95);
+            border-left: 4px solid #2980b9;
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 6px;
+        }
+        .complexity {
+            background: rgba(249,246,231,0.95);
+            border-left: 4px solid #e67e22;
+            padding: 16px;
+            border-radius: 6px;
+        }
+        .pseudocode-block {
+            background: rgba(44,62,80,0.07);
+            border-left: 4px solid #3498db;
+            padding: 18px 18px 12px 18px;
+            margin: 32px 0 0 0;
+            border-radius: 7px;
+            font-family: 'Consolas', 'Menlo', 'Monaco', 'Courier New', monospace;
+            box-shadow: 0 2px 8px 0 rgba(52,152,219,0.06);
+        }
+        .pseudocode-block h2 {
+            margin-top: 0;
+            color: #2980b9;
+            font-size: 1.18em;
+        }
+        .pseudocode-block pre {
+            margin: 0;
+            background: none;
+            font-size: 1.08em;
+            color: #222;
+            line-height: 1.7;
+            overflow-x: auto;
+        }
+        .pseudocode-block code {
+            background: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>合併排序法（Merge Sort）教學</h1>
+    <div class="explanation">
+        <h2>操作原理</h2>
+        <p>合併排序法是一種典型的分治演算法。先遞迴將陣列拆分成小區間，直到每個子區間只有一個元素，再透過合併過程把子區間依序組合成已排序區間。</p>
+    </div>
+    <div class="controls">
+        <button onclick="window.location.href='index.html'">返回導覽頁面</button>
+        <button id="startBtn">開始排序</button>
+        <button id="pauseBtn">暫停</button>
+        <button id="resumeBtn">繼續</button>
+        <button id="resetBtn">重設</button>
+    </div>
+    <div id="arrayContainer" style="margin-bottom: 24px;"></div>
+    <div id="mergeInfo" class="explanation" style="background: rgba(244, 233, 255, 0.95); border-left: 4px solid #8e44ad;">目前合併區間：<span id="mergeValue">無</span></div>
+    <div id="stepInfo" class="explanation"></div>
+    <div class="complexity">
+        <h2>複雜度評估</h2>
+        <ul>
+            <li>時間複雜度：O(n log n) (最壞、平均、最佳皆同)</li>
+            <li>空間複雜度：O(n)</li>
+        </ul>
+        <p>合併排序法穩定且在大型數據上表現穩定，適合需要穩定排序的場景。</p>
+    </div>
+    <div class="pseudocode-block">
+        <h2>合併排序法虛擬碼</h2>
+        <pre><code>function mergeSort(arr, left, right):
+    if left < right:
+        mid = (left + right) // 2
+        mergeSort(arr, left, mid)
+        mergeSort(arr, mid + 1, right)
+        merge(arr, left, mid, right)
+
+function merge(arr, left, mid, right):
+    create two temporary arrays L 和 R
+    i = j = 0
+    k = left
+    while i < length(L) and j < length(R):
+        if L[i] <= R[j]:
+            arr[k] = L[i]; i++
+        else:
+            arr[k] = R[j]; j++
+        k++
+    append remaining elements
+</code></pre>
+    </div>
+</div>
+<script>
+const arrayContainer = document.getElementById('arrayContainer');
+const stepInfo = document.getElementById('stepInfo');
+const mergeValue = document.getElementById('mergeValue');
+const startBtn = document.getElementById('startBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const resumeBtn = document.getElementById('resumeBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let array = [];
+let steps = [];
+let currentStep = 0;
+let sorting = false;
+let paused = false;
+let playTimeout = null;
+
+function randomArray(size = 8, min = 10, max = 99) {
+    const arr = [];
+    for (let i = 0; i < size; i++) {
+        arr.push(Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+    return arr;
+}
+
+function renderArray(arr, highlight = [], sortedIdx = []) {
+    arrayContainer.innerHTML = '';
+    arr.forEach((num, idx) => {
+        const bar = document.createElement('div');
+        bar.className = 'array-bar';
+        bar.style.height = (num * 2) + 'px';
+        bar.textContent = num;
+        if (highlight.includes(idx)) bar.classList.add('active');
+        if (sortedIdx.includes(idx)) bar.classList.add('sorted');
+        arrayContainer.appendChild(bar);
+    });
+}
+
+function recordStep(arr, left, mid, right, i, j, k, action) {
+    steps.push({ arr: arr.slice(), left, mid, right, i, j, k, action, sortedIdx: [] });
+}
+
+function mergeSortSteps(arr, left = 0, right = arr.length - 1) {
+    if (left >= right) {
+        if (left === right) {
+            recordStep(arr, left, right, right, -1, -1, -1, 'single');
+        }
+        return;
+    }
+    const mid = Math.floor((left + right) / 2);
+    mergeSortSteps(arr, left, mid);
+    mergeSortSteps(arr, mid + 1, right);
+    merge(arr, left, mid, right);
+}
+
+function merge(arr, left, mid, right) {
+    const leftArr = arr.slice(left, mid + 1);
+    const rightArr = arr.slice(mid + 1, right + 1);
+    let i = 0, j = 0, k = left;
+    recordStep(arr, left, mid, right, i, j, k, 'start_merge');
+
+    while (i < leftArr.length && j < rightArr.length) {
+        recordStep(arr, left, mid, right, i, j, k, 'compare');
+        if (leftArr[i] <= rightArr[j]) {
+            arr[k] = leftArr[i];
+            i++;
+        } else {
+            arr[k] = rightArr[j];
+            j++;
+        }
+        k++;
+        recordStep(arr, left, mid, right, i, j, k, 'assign');
+    }
+    while (i < leftArr.length) {
+        arr[k] = leftArr[i];
+        i++; k++;
+        recordStep(arr, left, mid, right, i, j, k, 'assign');
+    }
+    while (j < rightArr.length) {
+        arr[k] = rightArr[j];
+        j++; k++;
+        recordStep(arr, left, mid, right, i, j, k, 'assign');
+    }
+
+    recordStep(arr, left, mid, right, i, j, k, 'finished');
+}
+
+function showStep(step) {
+    const highlight = [];
+    if (step.k >= 0 && step.k < step.arr.length) highlight.push(step.k);
+    if (step.i >= 0 && step.i + step.left < step.arr.length) highlight.push(step.left + step.i);
+    if (step.j >= 0 && step.mid + 1 + step.j < step.arr.length) highlight.push(step.mid + 1 + step.j);
+    renderArray(step.arr, highlight, step.sortedIdx);
+
+    mergeValue.textContent = `left=${step.left}, mid=${step.mid}, right=${step.right}`;
+
+    if (step.action === 'start_merge') {
+        stepInfo.innerHTML = `開始合併區間 [${step.left}, ${step.mid}] 和 [${step.mid + 1}, ${step.right}]`;
+    } else if (step.action === 'compare') {
+        stepInfo.innerHTML = `比較左邊第 ${step.i + 1} 個與右邊第 ${step.j + 1} 個元素，填回第 ${step.k + 1} 個位置。`;
+    } else if (step.action === 'assign') {
+        stepInfo.innerHTML = `將選定元素放入第 ${step.k} 個位置。`;
+    } else if (step.action === 'finished') {
+        stepInfo.innerHTML = `合併完成，區間 [${step.left}, ${step.right}] 已排序。`;
+    } else if (step.action === 'single') {
+        stepInfo.innerHTML = `單一元素區間 ${step.left} 已視為已排序。`;
+    }
+}
+
+function playSteps() {
+    if (paused) return;
+    if (currentStep >= steps.length) {
+        sorting = false;
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        resumeBtn.disabled = true;
+        stepInfo.innerHTML = '排序完成！';
+        renderArray(steps[steps.length - 1].arr, [], Array.from({length: steps[steps.length - 1].arr.length}, (_, i) => i));
+        return;
+    }
+    sorting = true;
+    startBtn.disabled = true;
+    pauseBtn.disabled = false;
+    resumeBtn.disabled = true;
+    showStep(steps[currentStep]);
+    currentStep++;
+    playTimeout = setTimeout(playSteps, 900);
+}
+
+function reset() {
+    array = randomArray();
+    steps = [];
+    mergeSortSteps(array.slice());
+    currentStep = 0;
+    renderArray(array);
+    mergeValue.textContent = '無';
+    stepInfo.innerHTML = '點擊「開始排序」觀看合併排序法的操作過程。';
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    resumeBtn.disabled = true;
+    paused = false;
+    sorting = false;
+    if (playTimeout) clearTimeout(playTimeout);
+}
+
+startBtn.onclick = function() {
+    if (!sorting) {
+        currentStep = 0;
+        paused = false;
+        playSteps();
+    }
+};
+
+pauseBtn.onclick = function() {
+    if (sorting && !paused) {
+        paused = true;
+        pauseBtn.disabled = true;
+        resumeBtn.disabled = false;
+        if (playTimeout) clearTimeout(playTimeout);
+    }
+};
+
+resumeBtn.onclick = function() {
+    if (sorting && paused) {
+        paused = false;
+        pauseBtn.disabled = false;
+        resumeBtn.disabled = true;
+        playSteps();
+    }
+};
+
+resetBtn.onclick = function() {
+    if (!sorting || paused) {
+        reset();
+    }
+};
+
+reset();
+</script>
+</body>
+</html>
