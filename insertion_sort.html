@@ -192,22 +192,23 @@ function insertionSortSteps(arr) {
     let n = arr.length;
     let sortedIdx = [];
     let tempArr = arr.slice();
-    sortedIdx.push(0);
     for (let i = 1; i < n; i++) {
         let key = tempArr[i];
         let j = i - 1;
         // 初始檢查，key 握在手上，尚未移動
         recordStep(tempArr, i, j, key, false, sortedIdx);
         while (j >= 0 && tempArr[j] > key) {
-            // 視覺上仍未執行實際移動（不出現 duplicate 的錯覺）
-            recordStep(tempArr, i, j, key, true, sortedIdx);
+            // 視覺上仍未執行實際移動（不出現 duplicate 的錯覺），在此期間不顯示已排序
+            recordStep(tempArr, i, j, key, true, []);
             tempArr[j + 1] = tempArr[j];
             j--;
         }
         tempArr[j + 1] = key;
-        sortedIdx.push(i);
         recordStep(tempArr, i, j, null, false, sortedIdx);
     }
+    // 排序完成後，所有元素標記為已排序
+    sortedIdx = Array.from({length: n}, (_, i) => i);
+    recordStep(tempArr, -1, -1, null, false, sortedIdx);
 }
 
 function showStep(step) {
