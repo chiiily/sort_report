@@ -4,27 +4,77 @@
     <meta charset="UTF-8">
     <title>氣泡排序法教學</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
-        .container { max-width: 800px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #ccc; padding: 32px; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: rgba(120, 170, 220, 0.18);
+            border-radius: 18px;
+            box-shadow: 0 6px 32px 0 rgba(44,62,80,0.10), 0 1.5px 6px 0 rgba(44,62,80,0.08);
+            padding: 40px 32px 32px 32px;
+        }
         h1, h2 { color: #2c3e50; }
         .array-bar {
             display: inline-block;
             width: 32px;
             margin: 0 4px;
-            background: #3498db;
+            background: linear-gradient(180deg, #3498db 60%, #6dd5fa 100%);
             color: #fff;
             text-align: center;
-            border-radius: 4px 4px 0 0;
-            transition: background 0.3s;
+            border-radius: 6px 6px 0 0;
+            transition: background 0.3s, box-shadow 0.3s;
             vertical-align: bottom;
+            box-shadow: 0 2px 8px 0 rgba(52,152,219,0.10);
         }
-        .array-bar.active { background: #e67e22; }
-        .array-bar.sorted { background: #2ecc71; }
-        .controls { margin: 24px 0; }
-        button { padding: 8px 20px; font-size: 16px; border: none; border-radius: 4px; background: #2980b9; color: #fff; cursor: pointer; margin-right: 10px; }
-        button:disabled { background: #bdc3c7; cursor: not-allowed; }
-        .explanation { background: #f0f4f8; border-left: 4px solid #2980b9; padding: 16px; margin: 24px 0; border-radius: 4px; }
-        .complexity { background: #f9f6e7; border-left: 4px solid #e67e22; padding: 16px; border-radius: 4px; }
+        .array-bar.active {
+            background: linear-gradient(180deg, #e67e22 60%, #f9d423 100%);
+            box-shadow: 0 4px 16px 0 rgba(230,126,34,0.15);
+        }
+        .array-bar.sorted {
+            background: linear-gradient(180deg, #2ecc71 60%, #a8ff78 100%);
+            box-shadow: 0 4px 16px 0 rgba(46,204,113,0.12);
+        }
+        .controls {
+            margin: 24px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        button {
+            padding: 8px 22px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #2980b9 60%, #6dd5fa 100%);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 1.5px 6px 0 rgba(41,128,185,0.10);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .explanation {
+            background: rgba(240,244,248,0.95);
+            border-left: 4px solid #2980b9;
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 6px;
+        }
+        .complexity {
+            background: rgba(249,246,231,0.95);
+            border-left: 4px solid #e67e22;
+            padding: 16px;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
@@ -37,6 +87,8 @@
     <div class="controls">
         <button onclick="window.location.href='index.html'">返回導覽頁面</button>
         <button id="startBtn">開始排序</button>
+        <button id="pauseBtn">暫停</button>
+        <button id="resumeBtn">繼續</button>
         <button id="resetBtn">重設</button>
     </div>
     <div id="arrayContainer" style="margin-bottom: 24px;"></div>
@@ -55,13 +107,19 @@
 <script>
 const arrayContainer = document.getElementById('arrayContainer');
 const stepInfo = document.getElementById('stepInfo');
+
 const startBtn = document.getElementById('startBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const resumeBtn = document.getElementById('resumeBtn');
 const resetBtn = document.getElementById('resetBtn');
+
 
 let array = [];
 let steps = [];
 let currentStep = 0;
 let sorting = false;
+let paused = false;
+let playTimeout = null;
 
 function randomArray(size = 8, min = 10, max = 99) {
     const arr = [];
@@ -84,6 +142,7 @@ function renderArray(arr, highlight = [], sortedIdx = []) {
     });
 }
 
+
 function recordStep(arr, i, j, swapped, sortedIdx) {
     steps.push({ arr: arr.slice(), i, j, swapped, sortedIdx: sortedIdx.slice() });
 }
@@ -96,11 +155,11 @@ function bubbleSortSteps(arr) {
     for (let i = 0; i < n - 1; i++) {
         let swapped = false;
         for (let j = 0; j < n - 1 - i; j++) {
-            recordStep(tempArr, j, j + 1, false, sortedIdx);
-            if (tempArr[j] > tempArr[j + 1]) {
+            let needSwap = tempArr[j] > tempArr[j + 1];
+            recordStep(tempArr, j, j + 1, needSwap, sortedIdx);
+            if (needSwap) {
                 [tempArr[j], tempArr[j + 1]] = [tempArr[j + 1], tempArr[j]];
                 swapped = true;
-                recordStep(tempArr, j, j + 1, true, sortedIdx);
             }
         }
         sortedIdx.unshift(n - 1 - i);
@@ -126,20 +185,27 @@ function showStep(step) {
     }
 }
 
+
 function playSteps() {
+    if (paused) return;
     if (currentStep >= steps.length) {
         sorting = false;
         startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        resumeBtn.disabled = true;
         stepInfo.innerHTML = '排序完成！';
         renderArray(steps[steps.length - 1].arr, [], steps[steps.length - 1].sortedIdx);
         return;
     }
     sorting = true;
     startBtn.disabled = true;
+    pauseBtn.disabled = false;
+    resumeBtn.disabled = true;
     showStep(steps[currentStep]);
     currentStep++;
-    setTimeout(playSteps, 900);
+    playTimeout = setTimeout(playSteps, 900);
 }
+
 
 function reset() {
     array = randomArray();
@@ -148,17 +214,42 @@ function reset() {
     renderArray(array);
     stepInfo.innerHTML = '點擊「開始排序」觀看氣泡排序的操作過程。';
     startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    resumeBtn.disabled = true;
+    paused = false;
+    sorting = false;
+    if (playTimeout) clearTimeout(playTimeout);
 }
+
 
 startBtn.onclick = function() {
     if (!sorting) {
         currentStep = 0;
+        paused = false;
+        playSteps();
+    }
+};
+
+pauseBtn.onclick = function() {
+    if (sorting && !paused) {
+        paused = true;
+        pauseBtn.disabled = true;
+        resumeBtn.disabled = false;
+        if (playTimeout) clearTimeout(playTimeout);
+    }
+};
+
+resumeBtn.onclick = function() {
+    if (sorting && paused) {
+        paused = false;
+        pauseBtn.disabled = false;
+        resumeBtn.disabled = true;
         playSteps();
     }
 };
 
 resetBtn.onclick = function() {
-    if (!sorting) {
+    if (!sorting || paused) {
         reset();
     }
 };
