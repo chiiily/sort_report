@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>快速排序法教學</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: rgba(120, 170, 220, 0.18);
+            border-radius: 18px;
+            box-shadow: 0 6px 32px 0 rgba(44,62,80,0.10), 0 1.5px 6px 0 rgba(44,62,80,0.08);
+            padding: 40px 32px 32px 32px;
+        }
+        h1, h2 { color: #2c3e50; }
+        .array-bar {
+            display: inline-block;
+            width: 32px;
+            margin: 0 4px;
+            background: linear-gradient(180deg, #3498db 60%, #6dd5fa 100%);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px 6px 0 0;
+            transition: background 0.3s, box-shadow 0.3s;
+            vertical-align: bottom;
+            box-shadow: 0 2px 8px 0 rgba(52,152,219,0.10);
+        }
+        .array-bar.active {
+            background: linear-gradient(180deg, #e67e22 60%, #f9d423 100%);
+            box-shadow: 0 4px 16px 0 rgba(230,126,34,0.15);
+        }
+        .array-bar.sorted {
+            background: linear-gradient(180deg, #2ecc71 60%, #a8ff78 100%);
+            box-shadow: 0 4px 16px 0 rgba(46,204,113,0.12);
+        }
+        .array-bar.pivot {
+            background: linear-gradient(180deg, #9b59b6 60%, #ba68c8 100%);
+            box-shadow: 0 4px 16px 0 rgba(155,89,182,0.15);
+        }
+        .controls {
+            margin: 24px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        button {
+            padding: 8px 22px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #2980b9 60%, #6dd5fa 100%);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 1.5px 6px 0 rgba(41,128,185,0.10);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .explanation {
+            background: rgba(240,244,248,0.95);
+            border-left: 4px solid #2980b9;
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 6px;
+        }
+        .complexity {
+            background: rgba(249,246,231,0.95);
+            border-left: 4px solid #e67e22;
+            padding: 16px;
+            border-radius: 6px;
+        }
+        .pseudocode-block {
+            background: rgba(44,62,80,0.07);
+            border-left: 4px solid #3498db;
+            padding: 18px 18px 12px 18px;
+            margin: 32px 0 0 0;
+            border-radius: 7px;
+            font-family: 'Consolas', 'Menlo', 'Monaco', 'Courier New', monospace;
+            box-shadow: 0 2px 8px 0 rgba(52,152,219,0.06);
+        }
+        .pseudocode-block h2 {
+            margin-top: 0;
+            color: #2980b9;
+            font-size: 1.18em;
+        }
+        .pseudocode-block pre {
+            margin: 0;
+            background: none;
+            font-size: 1.08em;
+            color: #222;
+            line-height: 1.7;
+            overflow-x: auto;
+        }
+        .pseudocode-block code {
+            background: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>快速排序法（Quick Sort）教學</h1>
+    <div class="explanation">
+        <h2>操作原理</h2>
+        <p>快速排序法是一種分治演算法。選擇一個基準元素（pivot），將陣列分成兩部分：小於基準的元素和大於基準的元素，然後遞歸排序兩部分。</p>
+    </div>
+    <div class="controls">
+        <button onclick="window.location.href='index.html'">返回導覽頁面</button>
+        <button id="startBtn">開始排序</button>
+        <button id="pauseBtn">暫停</button>
+        <button id="resumeBtn">繼續</button>
+        <button id="resetBtn">重設</button>
+    </div>
+    <div id="arrayContainer" style="margin-bottom: 24px;"></div>
+    <div id="partitionInfo" class="explanation" style="background: rgba(244, 233, 255, 0.95); border-left: 4px solid #8e44ad;">目前 partition：<span id="partitionValue">無</span></div>
+    <div id="stepInfo" class="explanation"></div>
+    <div class="complexity">
+        <h2>複雜度評估</h2>
+        <ul>
+            <li>最壞情況時間複雜度：O(n²)</li>
+            <li>平均情況時間複雜度：O(n log n)</li>
+            <li>最佳情況時間複雜度：O(n log n)</li>
+            <li>空間複雜度：O(log n)</li>
+        </ul>
+        <p>快速排序法在實務中表現優秀，適合大型資料集，但最壞情況下效率較低。</p>
+    </div>
+    <div class="pseudocode-block">
+        <h2>快速排序法虛擬碼</h2>
+        <pre><code>function quickSort(arr, low, high):
+    if low < high:
+        pi = partition(arr, low, high)
+        quickSort(arr, low, pi - 1)
+        quickSort(arr, pi + 1, high)
+
+function partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+    for j from low to high - 1:
+        if arr[j] < pivot:
+            i++
+            swap arr[i] and arr[j]
+    swap arr[i+1] and arr[high]
+    return i+1
+</code></pre>
+    </div>
+</div>
+<script>
+const arrayContainer = document.getElementById('arrayContainer');
+const stepInfo = document.getElementById('stepInfo');
+const startBtn = document.getElementById('startBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const resumeBtn = document.getElementById('resumeBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let array = [];
+let steps = [];
+let currentStep = 0;
+let sorting = false;
+let paused = false;
+let playTimeout = null;
+
+function randomArray(size = 8, min = 10, max = 99) {
+    const arr = [];
+    for (let i = 0; i < size; i++) {
+        arr.push(Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+    return arr;
+}
+
+function renderArray(arr, highlight = [], sortedIdx = [], pivotIdx = -1) {
+    arrayContainer.innerHTML = '';
+    arr.forEach((num, idx) => {
+        const bar = document.createElement('div');
+        bar.className = 'array-bar';
+        bar.style.height = (num * 2) + 'px';
+        bar.textContent = num;
+        if (highlight.includes(idx)) bar.classList.add('active');
+        if (sortedIdx.includes(idx)) bar.classList.add('sorted');
+        if (idx === pivotIdx) bar.classList.add('pivot');
+        arrayContainer.appendChild(bar);
+    });
+}
+
+function recordStep(arr, low, high, pivotIdx, i, j, action, sortedIdx) {
+    steps.push({ arr: arr.slice(), low, high, pivotIdx, i, j, action, sortedIdx: sortedIdx.slice() });
+}
+
+function quickSortSteps(arr, low = 0, high = arr.length - 1, sortedIdx = []) {
+    if (low < high) {
+        let pi = partition(arr, low, high, sortedIdx);
+        quickSortSteps(arr, low, pi - 1, sortedIdx);
+        quickSortSteps(arr, pi + 1, high, sortedIdx);
+    } else if (low === high) {
+        sortedIdx.push(low);
+    }
+}
+
+function partition(arr, low, high, sortedIdx) {
+    let pivot = arr[high];
+    let i = low - 1;
+    recordStep(arr, low, high, high, i, -1, 'start_partition', sortedIdx);
+    for (let j = low; j < high; j++) {
+        recordStep(arr, low, high, high, i, j, 'compare', sortedIdx);
+        if (arr[j] < pivot) {
+            i++;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+            recordStep(arr, low, high, high, i, j, 'swap', sortedIdx);
+        }
+    }
+    [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+    recordStep(arr, low, high, high, i + 1, -1, 'pivot_swap', sortedIdx);
+    sortedIdx.push(i + 1);
+    return i + 1;
+}
+
+function showStep(step) {
+    let highlight = [];
+    if (step.j >= 0) highlight.push(step.j);
+    if (step.i >= 0) highlight.push(step.i);
+    renderArray(step.arr, highlight, step.sortedIdx, step.pivotIdx);
+
+    const partitionValueElem = document.getElementById('partitionValue');
+    if (step.action === 'start_partition') {
+        partitionValueElem.textContent = `基準: 第${step.pivotIdx + 1}個 (值 ${step.arr[step.pivotIdx]}), 範圍: 第${step.low + 1}到第${step.high + 1}個`;
+        stepInfo.innerHTML = '開始處理此 partition。';
+    } else {
+        if (step.action === 'compare') {
+            stepInfo.innerHTML = `比較第 <b>${step.j + 1}</b> 個元素（值 <b>${step.arr[step.j]}</b>）與基準（值 <b>${step.arr[step.pivotIdx]}</b>）。`;
+        } else if (step.action === 'swap') {
+            stepInfo.innerHTML = `交換第 <b>${step.i + 1}</b> 個與第 <b>${step.j + 1}</b> 個元素。`;
+        } else if (step.action === 'pivot_swap') {
+            stepInfo.innerHTML = `將基準元素放置到正確位置（第 <b>${step.i + 2}</b> 個）。`;
+        } else {
+            stepInfo.innerHTML = '排序完成！';
+            partitionValueElem.textContent = '無';
+        }
+    }
+}
+
+function playSteps() {
+    if (paused) return;
+    if (currentStep >= steps.length) {
+        sorting = false;
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        resumeBtn.disabled = true;
+        stepInfo.innerHTML = '排序完成！';
+        renderArray(steps[steps.length - 1].arr, [], Array.from({length: steps[steps.length - 1].arr.length}, (_, i) => i));
+        return;
+    }
+    sorting = true;
+    startBtn.disabled = true;
+    pauseBtn.disabled = false;
+    resumeBtn.disabled = true;
+    showStep(steps[currentStep]);
+    currentStep++;
+    playTimeout = setTimeout(playSteps, 900);
+}
+
+function reset() {
+    array = randomArray();
+    steps = [];
+    quickSortSteps(array.slice());
+    currentStep = 0;
+    renderArray(array);
+    document.getElementById('partitionValue').textContent = '無';
+    stepInfo.innerHTML = '點擊「開始排序」觀看快速排序的操作過程。';
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    resumeBtn.disabled = true;
+    paused = false;
+    sorting = false;
+    if (playTimeout) clearTimeout(playTimeout);
+}
+
+startBtn.onclick = function() {
+    if (!sorting) {
+        currentStep = 0;
+        paused = false;
+        playSteps();
+    }
+};
+
+pauseBtn.onclick = function() {
+    if (sorting && !paused) {
+        paused = true;
+        pauseBtn.disabled = true;
+        resumeBtn.disabled = false;
+        if (playTimeout) clearTimeout(playTimeout);
+    }
+};
+
+resumeBtn.onclick = function() {
+    if (sorting && paused) {
+        paused = false;
+        pauseBtn.disabled = false;
+        resumeBtn.disabled = true;
+        playSteps();
+    }
+};
+
+resetBtn.onclick = function() {
+    if (!sorting || paused) {
+        reset();
+    }
+};
+
+reset();
+</script>
+</body>
+</html>
