@@ -5,70 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>演算法教學導覽</title>
     <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+        }
+
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             margin: 0;
             padding: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            /* 隱藏背景裝飾球的溢出部分 */
+            overflow: hidden; 
+            position: relative;
         }
+
+        /* 增加背景裝飾球，提升玻璃透視的層次感 */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 0;
+        }
+        .shape1 {
+            width: 300px; height: 300px;
+            background: #ff9a9e;
+            top: -50px; left: -50px;
+            opacity: 0.6;
+        }
+        .shape2 {
+            width: 400px; height: 400px;
+            background: #a18cd1;
+            bottom: -100px; right: -50px;
+            opacity: 0.6;
+        }
+
         .nav-container {
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            padding: 40px;
+            /* 玻璃擬態 (Glassmorphism) 核心設定 */
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            padding: 50px 40px;
             text-align: center;
-            max-width: 600px;
+            max-width: 800px; /* 加寬以容納網格 */
             width: 90%;
+            z-index: 1; /* 確保在裝飾球之上 */
         }
+
         h1 {
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-size: 2.5em;
+            color: var(--text-main);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 2.8em;
+            font-weight: 800;
+            letter-spacing: 2px;
         }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1em;
+            margin-bottom: 40px;
+        }
+
+        /* 改用網格佈局 (Grid) 呈現卡片 */
         .nav-links {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
         }
+
         .nav-link {
-            display: block;
-            padding: 15px 30px;
-            background: #3498db;
-            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 25px 20px;
+            background: #ffffff;
+            color: var(--text-main);
             text-decoration: none;
-            border-radius: 8px;
-            font-size: 1.2em;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid transparent; /* 為 Hover 預留的邊框 */
         }
+
+        /* 個別卡片的左側邊框顏色 */
+        .nav-link:nth-child(1) { border-left-color: #FF6B6B; }
+        .nav-link:nth-child(2) { border-left-color: #4ECDC4; }
+        .nav-link:nth-child(3) { border-left-color: #45B7D1; }
+        .nav-link:nth-child(4) { border-left-color: #FDCB6E; }
+        .nav-link:nth-child(5) { border-left-color: #6C5CE7; }
+
         .nav-link:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            background: #f8fafc;
         }
-        .description {
-            color: #7f8c8d;
-            margin-top: 20px;
-            font-size: 1.1em;
+
+        .icon {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .title-zh {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .title-en {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .desc {
+            font-size: 0.85em;
+            color: #a0aec0;
+            line-height: 1.4;
+            text-align: left;
         }
     </style>
 </head>
 <body>
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+
     <div class="nav-container">
-        <h1>演算法教學導覽</h1>
+        <h1>演算法教學</h1>
+        <p class="subtitle">點擊下方卡片，開始探索各種排序演算法的奧秘</p>
+        
         <div class="nav-links">
-            <a href="bubble_sort.html" class="nav-link">氣泡排序法 (Bubble Sort)</a>
-            <a href="selection_sort.html" class="nav-link">選擇排序法 (Selection Sort)</a>
-            <a href="insertion_sort.html" class="nav-link">插入排序法 (Insertion Sort)</a>
-            <a href="quick_sort.html" class="nav-link">快速排序法 (Quick Sort)</a>
-            <a href="merge_sort.html" class="nav-link">合併排序法 (Merge Sort)</a>
+            <a href="bubble_sort.html" class="nav-link">
+                <span class="icon">🫧</span>
+                <span class="title-zh">氣泡排序法</span>
+                <span class="title-en">Bubble Sort</span>
+                <span class="desc">簡單直觀的演算法，透過相鄰元素的比較與交換將極值推向頂端。</span>
+            </a>
+            
+            <a href="selection_sort.html" class="nav-link">
+                <span class="icon">🎯</span>
+                <span class="title-zh">選擇排序法</span>
+                <span class="title-en">Selection Sort</span>
+                <span class="desc">每次從未排序的區間尋找最小值，並將其放到已排序區間的末端。</span>
+            </a>
+            
+            <a href="insertion_sort.html" class="nav-link">
+                <span class="icon">🃏</span>
+                <span class="title-zh">插入排序法</span>
+                <span class="title-en">Insertion Sort</span>
+                <span class="desc">宛如整理撲克牌，將元素逐一插入到前方已排序的正確位置。</span>
+            </a>
+            
+            <a href="quick_sort.html" class="nav-link">
+                <span class="icon">⚡</span>
+                <span class="title-zh">快速排序法</span>
+                <span class="title-en">Quick Sort</span>
+                <span class="desc">基於分治法的高效演算法，選擇基準點將陣列一分為二。</span>
+            </a>
+            
+            <a href="merge_sort.html" class="nav-link">
+                <span class="icon">🧩</span>
+                <span class="title-zh">合併排序法</span>
+                <span class="title-en">Merge Sort</span>
+                <span class="desc">穩定且有效率的分治法，將陣列不斷拆分後再依序合併。</span>
+            </a>
         </div>
-        <p class="description">點擊上方連結開始學習各種排序演算法！</p>
     </div>
 </body>
 </html>
-
